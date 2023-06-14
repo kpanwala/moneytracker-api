@@ -3,6 +3,7 @@ package com.moneymanager.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.moneymanager.dto.UserDetailsResponse;
 import com.moneymanager.entity.Transactions;
 import com.moneymanager.entity.Usersdetails;
 
@@ -12,7 +13,8 @@ public interface MoneyManagerService {
 
 	int getIdOfUser(String uname, String password);
 
-	Optional<Usersdetails> getUserDetails(int id);
+	//Optional<UserDetailsResponse> getUserDetails(int id);
+	UserDetailsResponse getUserDetailsWithCardsById(int id);
 
 	List<Transactions> getTransactionsOfUser(int id);
 

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moneymanager.dto.UserDetailsResponse;
 import com.moneymanager.entity.Transactions;
 import com.moneymanager.entity.Usersdetails;
 import com.moneymanager.service.MoneyManagerService;
@@ -37,16 +38,16 @@ public class MoneyManagerController {
 	@GetMapping("/authenticate")
 	@CrossOrigin(origins = "http://localhost:4200")
 	@ResponseBody
-	public ResponseEntity<Usersdetails> findUserDetails(@RequestParam("uname") String username,
+	public ResponseEntity<UserDetailsResponse> findUserDetails(@RequestParam("uname") String username,
 			@RequestParam("pass") String password) {
 		System.out.println("Into auth func UNAME: "+username+" password: "+password);
 		
 		id=this.moneyManagerService.getIdOfUser(username, password);
 		
 		System.out.println(id);
-		Usersdetails uDetails = null;
+		UserDetailsResponse uDetails = null;
 		if (id != -1) {
-			uDetails = this.moneyManagerService.getUserDetails(id).orElse(null);
+			uDetails = this.moneyManagerService.getUserDetailsWithCardsById(id);
 		}
 		return new ResponseEntity<>(uDetails, HttpStatus.OK);
 	}
