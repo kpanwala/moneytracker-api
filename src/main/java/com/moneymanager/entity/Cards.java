@@ -9,6 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "Cards")
@@ -19,14 +23,28 @@ public class Cards {
 	int id;
 	String cardName;
 	String cardType;
-	int uId;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uId")
+	Usersdetails userdetails;
 
+	public Usersdetails getUserdetails() {
+		return userdetails;
+	}
 
-	public Cards() {}
-
+	public void setUserdetails(Usersdetails userdetails) {
+		this.userdetails = userdetails;
+	}
 
 	public int getId() {
 		return id;
+	}
+
+	public Cards(int id, String cardName, String cardType) {
+		super();
+		this.id = id;
+		this.cardName = cardName;
+		this.cardType = cardType;
 	}
 
 	public void setId(int id) {
@@ -49,23 +67,9 @@ public class Cards {
 		this.cardType = cardType;
 	}
 
-
-	public Cards(int id, String cardName, String cardType, int uId) {
+	public Cards() {
 		super();
-		this.id = id;
-		this.cardName = cardName;
-		this.cardType = cardType;
-		this.uId=uId;
 	}
-
-
-	public int getuId() {
-		return uId;
-	}
-
-
-	public void setuId(int uId) {
-		this.uId = uId;
-	}
+	
 
 }

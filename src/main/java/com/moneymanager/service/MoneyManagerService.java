@@ -19,4 +19,6 @@ public interface MoneyManagerService {
 	List<Transactions> getTransactionsOfUser(int id);
 
 	List<Usersdetails> getAllUsers();
+	
+	public List<Transactions> findUserTransactionsByYear(int id, int startYear, int endYear);
 }

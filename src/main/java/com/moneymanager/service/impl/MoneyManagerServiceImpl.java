@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.moneymanager.dto.CardsResponse;
+import com.moneymanager.dto.TransactionsByYearResponse;
 import com.moneymanager.dto.UserDetailsResponse;
 import com.moneymanager.entity.Cards;
 import com.moneymanager.entity.Transactions;
@@ -39,16 +42,22 @@ public class MoneyManagerServiceImpl implements MoneyManagerService {
 
 	
 	public UserDetailsResponse getUserDetailsWithCardsById(int id) {
-		Usersdetails ud = userRepository.findById(id).orElse(null);
-		List<Cards> cds = cardsRepository.findUserCards(id);
-		UserDetailsResponse output = new UserDetailsResponse(ud.getId(),ud.getF_name(), ud.getL_name());
-		List<CardsResponse> cdList = new LinkedList<>();  
-		for(Cards cd: cds) {
-			cdList.add(new CardsResponse(cd.getId(), cd.getCardName(), cd.getCardType()));
-		}
-		output.setCards(cdList);
+		UserDetailsResponse output = new UserDetailsResponse();
+		Usersdetails userDetails = userRepository.findById(id).get();
+		output.setUserdetails(userDetails);
+        List<Cards> cards = cardsRepository.findByUserdetails(userDetails);
+        List<CardsResponse> cardsResponse = cards
+        		.stream()
+        		.map((e)->new CardsResponse(e.getId(), e.getCardName(), e.getCardType()))
+        		.collect(Collectors.toList());
+        userDetails.setCards(cardsResponse);
+        
         return output;
     }
+	
+	public List<Transactions> findUserTransactionsByYear(int id, int startYear, int endYear) {
+		return transactionRepository.findUserTransationsByYear(id, startYear, endYear);
+	}
 
 	public List<Transactions> getTransactionsOfUser(int id) {
 		return transactionRepository.findUserTransations(id);
