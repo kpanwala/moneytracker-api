@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moneymanager.dto.TransactionByMonths;
 import com.moneymanager.dto.TransactionByYear;
+import com.moneymanager.dto.TransactionByYearMonths;
+import com.moneymanager.dto.TransactionsByMonthsResponse;
 import com.moneymanager.dto.TransactionsByYearResponse;
 import com.moneymanager.dto.UserDetailsResponse;
 import com.moneymanager.entity.Transactions;
@@ -29,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -171,7 +175,6 @@ public class MoneyManagerController {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(t);
 			int year = calendar.get(Calendar.YEAR);
-			System.out.println(year);
 			List<Transactions> list;
 			if(mp.containsKey(year+"")) {
 				list = mp.get(year+"");
@@ -196,7 +199,157 @@ public class MoneyManagerController {
 		
 		return output;
 	}
+	
+	/*
+	 * 
+	 * ENDPOINT: /getUserTransactionsByMonths?id=4&startYear=2022&endYear=2023
+	 * 
+	 * RESPONSE: 
+	 * 
+	 * {
+		    "transactionsByMonths": [
+		        {
+		            "year": "2023",
+		            "transactionsByMonths": [
+		                {
+		                    "month": "1",
+		                    "transactions": [
+		                        {
+		                            "transId": 13,
+		                            "placeOfTransaction": "Big Basket",
+		                            "transactionAmount": 579,
+		                            "cardIdUsed": "8",
+		                            "category": "Food",
+		                            "dateOfTransaction": "2023-01-04T18:30:00.000+00:00"
+		                        }
+		                    ]
+		                },
+		                {
+		                    "month": "3",
+		                    "transactions": [
+		                        {
+		                            "transId": 12,
+		                            "placeOfTransaction": "Jio Mart",
+		                            "transactionAmount": 608,
+		                            "cardIdUsed": "6",
+		                            "category": "Food",
+		                            "dateOfTransaction": "2023-03-21T18:30:00.000+00:00"
+		                        },
+		                        {
+		                            "transId": 11,
+		                            "placeOfTransaction": "Asian Paints",
+		                            "transactionAmount": 1478,
+		                            "cardIdUsed": "7",
+		                            "category": "Other",
+		                            "dateOfTransaction": "2023-03-13T18:30:00.000+00:00"
+		                        }
+		                    ]
+		                }
+		            ]
+		        },
+		        {
+		            "year": "2022",
+		            "transactionsByMonths": [
+		                {
+		                    "month": "7",
+		                    "transactions": [
+		                        {
+		                            "transId": 10,
+		                            "placeOfTransaction": "Jio Mart",
+		                            "transactionAmount": 420,
+		                            "cardIdUsed": "6",
+		                            "category": "Food",
+		                            "dateOfTransaction": "2022-07-01T18:30:00.000+00:00"
+		                        }
+		                    ]
+		                }
+		            ]
+		        }
+		    ]
+		}
+	 * 
+	 */
 
+	@GetMapping("/getUserTransactionsByMonths")
+	@CrossOrigin(origins = "http://localhost:4200")
+	@ResponseBody
+	public ResponseEntity<TransactionsByMonthsResponse> findUserTransactionsByMonths(@RequestParam(value="id", required = true) int id,
+			@RequestParam(value="startYear", required = true) int startYear, @RequestParam(value="endYear", required = false) Optional<Integer> endYear) {
+		int endYearTemp;
+		if (id != -1) {
+			if (endYear.isPresent()) {
+				endYearTemp = endYear.get(); 
+			}
+			else{
+				endYearTemp = startYear;
+			}
+			return new ResponseEntity<>(findUserTransactionsByMonthsImpl(id, startYear, endYearTemp), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	public TransactionsByMonthsResponse findUserTransactionsByMonthsImpl(int id, int startYear, int endYear) {
+		List<Transactions> uTransactions = null;
+		uTransactions = this.moneyManagerService.findUserTransactionsByYear(id, startYear, endYear);
+		Map<String, Map <Integer, List<Transactions>>> mp = new HashMap<>();
+		
+		uTransactions.stream().forEach((e)->{
+			Timestamp t = e.getDateOfTransaction();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(t);
+			int year = calendar.get(Calendar.YEAR);
+			int month = calendar.get(Calendar.MONTH)+1;
+			Map <Integer, List<Transactions>> monthsMap;
+			
+			// Finding the year 
+			if(mp.containsKey(year+"")) {
+				monthsMap = mp.get(year+"");
+			}
+			else {
+				monthsMap = new HashMap <Integer, List<Transactions>>();
+			}
+			
+			// Finding the Month of the year  			
+			List <Transactions> transMonth;
+			if(monthsMap.containsKey(month)) {
+				transMonth = monthsMap.get(month);
+			}
+			else {
+				transMonth = new LinkedList <Transactions> ();
+			}
+			transMonth.add(e);
+			
+			monthsMap.put(Integer.valueOf(month), transMonth);
+			mp.put(year+"", monthsMap);
+		});
+		
+		TransactionsByMonthsResponse output = new TransactionsByMonthsResponse();
+		List <TransactionByYearMonths> outputYearsMonths = new LinkedList<TransactionByYearMonths>();
+		
+		
+		for(Entry<String, Map<Integer, List<Transactions>>> t: mp.entrySet()) {
+			TransactionByYearMonths outputYear = new TransactionByYearMonths();
+			List<TransactionByMonths> outputMonthsList = new LinkedList<TransactionByMonths>();
+			
+			outputYear.setYear(t.getKey()+"");
+			Map<Integer, List<Transactions>> outputMonthMap = t.getValue();
+			TransactionByMonths outputMonths;
+			
+			for(Entry<Integer, List<Transactions>> child: outputMonthMap.entrySet()) {
+				outputMonths = new TransactionByMonths();
+				outputMonths.setMonth(child.getKey()+"");
+				outputMonths.setTransactions(child.getValue());
+				outputMonthsList.add(outputMonths);
+			}
+			
+			outputYear.setTransactionsByMonths(outputMonthsList);
+			outputYearsMonths.add(outputYear);
+		}
+		output.setTransactionsByYears(outputYearsMonths);
+		
+		return output;
+	}
+	
 	@GetMapping("/allUsers")
 	@ResponseBody
 	public ResponseEntity<List<Usersdetails>> getAllUserDetails() {
