@@ -11,6 +11,6 @@ import com.moneymanager.entity.Usercredentials;
 
 @Repository
 public interface UserCredentialsRepository extends JpaRepository<Usercredentials, Integer> {
-	@Query(value = "SELECT id FROM UsersCredentials WHERE username = ?1 and password= ?2", nativeQuery=true)
+	@Query(value = "SELECT id FROM UserCredentials WHERE username = ?1 and password= ?2", nativeQuery=true)
 	public List<Integer> findUserCredentials(String username, String password);
 }

@@ -19,6 +19,7 @@ public class Usercredentials {
 	public int id;
 	public String username;
 	public String password;
+	
 	public int getId() {
 		return id;
 	}

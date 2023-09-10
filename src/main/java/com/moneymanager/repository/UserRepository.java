@@ -13,10 +13,7 @@ import com.moneymanager.entity.Usersdetails;
 
 @Repository
 public interface UserRepository extends JpaRepository<Usersdetails, Integer> {
-//	@Query(value = "SELECT * FROM UsersDetails", nativeQuery=true)
-//	public List<Usersdetails> findAll();
-//
+
 	@Query(value = "SELECT * FROM UsersDetails WHERE id = ?1", nativeQuery=true)
-	public Optional<Usersdetails> findAllDetailsById(@Param("id")int id);
-	
+	public Optional<Usersdetails> findAllDetailsById(@Param("id")int id);	
 }

@@ -12,13 +12,9 @@ import com.moneymanager.entity.Usersdetails;
 
 @Repository
 public interface CardsRepository extends JpaRepository<Cards, Integer> {
-		
-//		@Query(value = "SELECT * FROM Cards WHERE uId = ?1", nativeQuery = true)
-//		public List<Cards> findUserCards(int id);
 
 		
-//		@Query(value = "select * from Cards c where c.uId = ?1", nativeQuery=true)
-//		public List<Cards> findUserCards(int id);
+		@Query(value = "select * from Cards c where c.uId = ?1", nativeQuery=true)
+		public List<Cards> findByUserId(int id);
 		
-		List<Cards> findByUserdetails(Usersdetails userdetails);
 }

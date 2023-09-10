@@ -7,18 +7,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moneymanager.dto.CardsResponse;
 import com.moneymanager.dto.TransactionByMonths;
 import com.moneymanager.dto.TransactionByYear;
 import com.moneymanager.dto.TransactionByYearMonths;
 import com.moneymanager.dto.TransactionsByMonthsResponse;
 import com.moneymanager.dto.TransactionsByYearResponse;
+import com.moneymanager.dto.UserData;
 import com.moneymanager.dto.UserDetailsResponse;
+import com.moneymanager.entity.Cards;
 import com.moneymanager.entity.Transactions;
+import com.moneymanager.entity.Usercredentials;
 import com.moneymanager.entity.Usersdetails;
 import com.moneymanager.service.MoneyManagerService;
 
@@ -26,6 +32,8 @@ import jakarta.transaction.Transaction;
 import lombok.AllArgsConstructor;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -169,9 +177,20 @@ public class MoneyManagerController {
 		List<Transactions> uTransactions = null;
 		uTransactions = this.moneyManagerService.findUserTransactionsByYear(id, startYear, endYear);
 		Map<String, List<Transactions>> mp = new HashMap<>();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		
 		uTransactions.stream().forEach((e)->{
-			Timestamp t = e.getDateOfTransaction();
+			Date parsedDate;
+			Timestamp t = new Timestamp(System.currentTimeMillis());
+			try {
+				parsedDate = dateFormat.parse(e.getDateOfTransaction());
+				t = new java.sql.Timestamp(parsedDate.getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		    
+			//Timestamp t = e.getDateOfTransaction();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(t);
 			int year = calendar.get(Calendar.YEAR);
@@ -292,9 +311,18 @@ public class MoneyManagerController {
 		List<Transactions> uTransactions = null;
 		uTransactions = this.moneyManagerService.findUserTransactionsByYear(id, startYear, endYear);
 		Map<String, Map <Integer, List<Transactions>>> mp = new HashMap<>();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		
 		uTransactions.stream().forEach((e)->{
-			Timestamp t = e.getDateOfTransaction();
+		    Date parsedDate;
+		    Timestamp t = new Timestamp(System.currentTimeMillis());
+			try {
+				parsedDate = dateFormat.parse(e.getDateOfTransaction());
+				t = new java.sql.Timestamp(parsedDate.getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(t);
 			int year = calendar.get(Calendar.YEAR);
@@ -360,6 +388,76 @@ public class MoneyManagerController {
 	@ResponseBody
 	public ResponseEntity<List<String>> testApi() {
 		return new ResponseEntity<>(this.moneyManagerService.testApi(), HttpStatus.OK);
+	}
+	
+	/*
+	 * Payload: 
+	 * {
+		    "f_name": "Raj",
+		    "l_name": "Kapoor"
+	   }
+
+	 * 
+	 */
+//	@PostMapping("/addUser")
+//	@CrossOrigin(origins = "http://localhost:4200")
+//	public ResponseEntity<String> addUserDetails(@RequestBody Usersdetails user)  
+//	{  
+//		this.moneyManagerService.saveUsersDetails(user);
+//		return new ResponseEntity<>("Success", HttpStatus.OK); 
+//	}
+	
+//	@PostMapping("/addCredential")
+//	@CrossOrigin(origins = "http://localhost:4200")
+//	public ResponseEntity<String> addUserCredential(@RequestBody Usercredentials user)  
+//	{  
+//		this.moneyManagerService.saveUserCredential(user);
+//		return new ResponseEntity<>("Success", HttpStatus.OK); 
+//	}
+	
+	@PostMapping("/addUser")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<String> addUserCredential(@RequestBody UserData user)  
+	{  
+		this.moneyManagerService.saveUsersDetails(new Usersdetails(0,user.getF_name(), user.getL_name()));
+		this.moneyManagerService.saveUserCredential(new Usercredentials(0, user.getUsername(), user.getPassword()));
+		return new ResponseEntity<>("Success", HttpStatus.OK); 
+	}
+	
+	/*
+	 * Payload: 
+	 * 
+	 * {
+		  "cardName":"Axis Magnus",
+		  "cardType":"debit",
+		  "uId":5
+	   }
+	 * 
+	 */
+	@PostMapping("/addCard")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<String> addCardForUser(@RequestBody Cards card)  
+	{  
+		this.moneyManagerService.saveCardForUser(card);
+		return new ResponseEntity<>("Success", HttpStatus.OK); 
+	}
+	
+	/*
+	 * Payload: 
+	 * 
+	 * {
+		  "cardName":"Axis Magnus",
+		  "cardType":"debit",
+		  "uId":5
+		}
+	 * 
+	 */
+	@PostMapping("/addTransaction")
+	@CrossOrigin(origins = "http://localhost:4200")
+	public ResponseEntity<String> addTransaction(@RequestBody Transactions t)  
+	{
+		this.moneyManagerService.saveTransaction(t);
+		return new ResponseEntity<>("Success", HttpStatus.OK); 
 	}
 
 }

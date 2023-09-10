@@ -14,6 +14,7 @@ import com.moneymanager.dto.TransactionsByYearResponse;
 import com.moneymanager.dto.UserDetailsResponse;
 import com.moneymanager.entity.Cards;
 import com.moneymanager.entity.Transactions;
+import com.moneymanager.entity.Usercredentials;
 import com.moneymanager.entity.Usersdetails;
 import com.moneymanager.repository.CardsRepository;
 import com.moneymanager.repository.TransactionsRepository;
@@ -45,12 +46,12 @@ public class MoneyManagerServiceImpl implements MoneyManagerService {
 		UserDetailsResponse output = new UserDetailsResponse();
 		Usersdetails userDetails = userRepository.findById(id).get();
 		output.setUserdetails(userDetails);
-        List<Cards> cards = cardsRepository.findByUserdetails(userDetails);
+        List<Cards> cards = cardsRepository.findByUserId(userDetails.getId());
         List<CardsResponse> cardsResponse = cards
         		.stream()
         		.map((e)->new CardsResponse(e.getId(), e.getCardName(), e.getCardType()))
         		.collect(Collectors.toList());
-        userDetails.setCards(cardsResponse);
+        output.setCard(cardsResponse);
         
         return output;
     }
@@ -69,5 +70,23 @@ public class MoneyManagerServiceImpl implements MoneyManagerService {
 
 	public List<String> testApi() {
 		return List.of("kalp", "aakash", "denis");
+	} 
+	
+	public void saveUsersDetails(Usersdetails usr) {		
+		userRepository.save(usr);
 	}
+	
+	public void saveCardForUser(Cards card) {
+		cardsRepository.save(card);
+	}
+	
+	public void saveTransaction(Transactions t) {
+		transactionRepository.save(t);
+	}
+	
+	public void saveUserCredential(Usercredentials uc) {
+		userCredentialsRepository.save(uc);
+	}
+	
+	
 }

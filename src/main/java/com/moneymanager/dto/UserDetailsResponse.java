@@ -18,12 +18,15 @@ import lombok.ToString;
 @Data
 public class UserDetailsResponse {
 	Usersdetails userdetails;
+	List<CardsResponse> card;
 	
-	public UserDetailsResponse(Usersdetails userdetails) {
-		super();
-		this.userdetails = userdetails;
-	}
 	public UserDetailsResponse() {
 		super();
+	}
+
+	public UserDetailsResponse(Usersdetails userdetails, List<CardsResponse> card) {
+		super();
+		this.userdetails = userdetails;
+		this.card = card;
 	}
 }

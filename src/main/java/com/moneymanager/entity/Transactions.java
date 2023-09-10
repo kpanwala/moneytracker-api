@@ -1,9 +1,6 @@
 package com.moneymanager.entity;
 
-import java.sql.Timestamp;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,12 +17,11 @@ public class Transactions {
 
 	String placeOfTransaction;
 	int transactionAmount;
-	String cardIdUsed;
+	int cardIdUsed;
 	String category;
-	Timestamp dateOfTransaction;
-	
-	@JsonIgnore
+	String dateOfTransaction;
 	int id;
+	
 	public int getTransId() {
 		return transId;
 	}
@@ -44,10 +40,10 @@ public class Transactions {
 	public void setTransactionAmount(int transactionAmount) {
 		this.transactionAmount = transactionAmount;
 	}
-	public String getCardIdUsed() {
+	public int getCardIdUsed() {
 		return cardIdUsed;
 	}
-	public void setCardIdUsed(String cardIdUsed) {
+	public void setCardIdUsed(int cardIdUsed) {
 		this.cardIdUsed = cardIdUsed;
 	}
 	public String getCategory() {
@@ -56,10 +52,10 @@ public class Transactions {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-	public Timestamp getDateOfTransaction() {
+	public String getDateOfTransaction() {
 		return dateOfTransaction;
 	}
-	public void setDateOfTransaction(Timestamp dateOfTransaction) {
+	public void setDateOfTransaction(String dateOfTransaction) {
 		this.dateOfTransaction = dateOfTransaction;
 	}
 	public int getId() {
@@ -68,8 +64,8 @@ public class Transactions {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Transactions(int transId, String placeOfTransaction, int transactionAmount, String cardIdUsed,
-			String category, Timestamp dateOfTransaction, int id) {
+	public Transactions(int transId, String placeOfTransaction, int transactionAmount, int cardIdUsed,
+			String category, String dateOfTransaction, int id) {
 		super();
 		this.transId = transId;
 		this.placeOfTransaction = placeOfTransaction;

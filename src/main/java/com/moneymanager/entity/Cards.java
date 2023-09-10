@@ -22,29 +22,43 @@ public class Cards {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
 	String cardName;
-	String cardType;
+	String cardType;	
+	int uId;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "uId")
-	Usersdetails userdetails;
-
-	public Usersdetails getUserdetails() {
-		return userdetails;
-	}
-
-	public void setUserdetails(Usersdetails userdetails) {
-		this.userdetails = userdetails;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public Cards(int id, String cardName, String cardType) {
+	public Cards(int id, String cardName, String cardType, int uId) {
 		super();
 		this.id = id;
 		this.cardName = cardName;
 		this.cardType = cardType;
+		this.uId = uId;
+	}
+	
+	public Cards() {
+		super();
+	}
+
+	public int getuId() {
+		return uId;
+	}
+
+	public void setuId(int uId) {
+		this.uId = uId;
+	}
+
+//	@ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "uId")
+//	Usersdetails userdetails;
+//
+//	public Usersdetails getUserdetails() {
+//		return userdetails;
+//	}
+//
+//	public void setUserdetails(Usersdetails userdetails) {
+//		this.userdetails = userdetails;
+//	}
+
+	public int getId() {
+		return id;
 	}
 
 	public void setId(int id) {
@@ -66,10 +80,5 @@ public class Cards {
 	public void setCardType(String cardType) {
 		this.cardType = cardType;
 	}
-
-	public Cards() {
-		super();
-	}
-	
 
 }

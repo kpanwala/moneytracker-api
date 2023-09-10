@@ -30,21 +30,20 @@ public class Usersdetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@Column(name = "fName")
+	@Column(name = "f_name")
 	String f_name;
-	@Column(name = "lName")
+	@Column(name = "l_name")
 	String l_name;
 	
-	@Transient
-	@Column(name = "cards")
-	List<CardsResponse> cards;
+//	@Transient
+//	@Column(name = "cards")
+//	List<CardsResponse> cards;
 
-	public Usersdetails(int id, String f_name, String l_name, List<CardsResponse> cards) {
+	public Usersdetails(int id, String f_name, String l_name) {
 		super();
 		this.id = id;
 		this.f_name = f_name;
 		this.l_name = l_name;
-		this.cards = cards;
 	}
 
 	public Usersdetails() {
@@ -74,14 +73,4 @@ public class Usersdetails {
 	public void setL_name(String l_name) {
 		this.l_name = l_name;
 	}
-
-	public List<CardsResponse> getCards() {
-		return cards;
-	}
-
-	public void setCards(List<CardsResponse> cards) {
-		this.cards = cards;
-	}
-	
-	
 }
